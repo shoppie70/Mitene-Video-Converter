@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>2分にしてね</string>
+	<key>CFBundleExecutable</key>
+	<string>MiteneVideoConverter</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.shoppie70.mitenevideoconverter</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>2分にしてね</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>0.1.0</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.video</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSRequiresNativeExecution</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>変換した動画を写真アプリへ追加するために使用します。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>変換した動画を写真アプリへ追加するために使用します。</string>
+</dict>
+</plist>

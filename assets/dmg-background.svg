@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="800" viewBox="0 0 1320 800">
+  <rect width="1320" height="800" fill="#f7f8f3"/>
+  <circle cx="1160" cy="120" r="220" fill="#ccebd9"/>
+  <circle cx="1030" cy="680" r="180" fill="#ffd4ad"/>
+  <path d="M120 570 C350 470 450 650 650 550 S950 440 1170 530" fill="none" stroke="#172522" stroke-opacity=".12" stroke-width="2"/>
+  <text x="92" y="166" fill="#172522" font-family="Hiragino Sans, Yu Gothic, sans-serif" font-size="42" font-weight="700">2分にしてね</text>
+  <text x="94" y="210" fill="#66756f" font-family="Hiragino Sans, Yu Gothic, sans-serif" font-size="17">Mitene Video Converter</text>
+  <text x="94" y="674" fill="#66756f" font-family="Hiragino Sans, Yu Gothic, sans-serif" font-size="18">アプリをApplicationsへドラッグしてインストール</text>
+  <path d="M340 380 H980" stroke="#e66f53" stroke-width="4" stroke-linecap="round"/>
+  <path d="M950 350 L990 380 L950 410" fill="none" stroke="#e66f53" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

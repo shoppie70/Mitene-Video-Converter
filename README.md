@@ -78,6 +78,24 @@ docs/
 ## 開発状況
 
 > [!NOTE]
-> このリポジトリには、Swift Packageから起動できる開発版アプリと、GitHub Pages用のLPが含まれます。署名済みアプリ、DMG、Releaseページからのダウンロードはまだ用意していません。
+> このリポジトリには、Swift Packageから起動できるアプリ、Universal BinaryのDMGを作るスクリプト、GitHub Pages用のLPが含まれます。配布用DMGは `v*` タグのGitHub Actionsから作成します。
 
 「2分にしてね - Mitene Video Converter」は、みてねを利用しやすくする非公式ツールです。みてねへの直接ログインや直接アップロードは行いません。
+
+## ダウンロード
+
+配布版は [GitHub Releases](https://github.com/shoppie70/Mitene-Video-Converter/releases) からダウンロードできます。
+
+DMGはUniversal Binary（Apple Silicon / Intel）として作成しています。現在の配布版はAppleのDeveloper ID署名・公証を行っていないため、初回起動時にmacOSの確認が表示される場合があります。その場合は、アプリを右クリックして「開く」を選び、表示された確認で起動してください。
+
+## DMGの作成
+
+ローカルで配布用アプリとDMGを作成するには、`dmgbuild` が必要です。
+
+```sh
+python3 -m pip install --user dmgbuild
+VERSION=0.1.0 ./scripts/build_app.sh
+VERSION=0.1.0 ./scripts/build_dmg.sh
+```
+
+生成物は `dist/` に作られます。DMG作成後は `hdiutil verify` による整合性検証も自動で行います。
