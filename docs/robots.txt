@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shoppie70.github.io/Mitene-Video-Converter/sitemap.xml
