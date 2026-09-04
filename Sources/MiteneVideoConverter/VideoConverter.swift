@@ -16,6 +16,7 @@ final class VideoConverter {
         progress: @escaping (Double) -> Void
     ) async throws -> [URL] {
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
+        try checkAvailableStorage(for: outputDirectory, duration: analysis.duration)
 
         let asset = AVURLAsset(url: analysis.sourceURL)
         let tracks = try await asset.load(.tracks)
@@ -121,12 +122,51 @@ final class VideoConverter {
                 if session.status == .completed {
                     continuation.resume()
                 } else if let error = session.error {
-                    continuation.resume(throwing: VideoConverterError.exportFailed(error.localizedDescription))
+                    let detailedMessage = Self.describe(exportError: error)
+                    continuation.resume(throwing: VideoConverterError.exportFailed(detailedMessage))
                 } else {
-                    continuation.resume(throwing: VideoConverterError.exportFailed("Export ended unexpectedly"))
+                    continuation.resume(throwing: VideoConverterError.exportFailed("エクスポート処理が予期せず終了しました"))
                 }
             }
         }
+    }
+
+    private func checkAvailableStorage(for directory: URL, duration: Double) throws {
+        let values = try? directory.resourceValues(forKeys: [.volumeAvailableCapacityKey])
+        guard let available = values?.volumeAvailableCapacity else { return }
+        try Self.evaluateStorage(availableBytes: Int64(available), duration: duration)
+    }
+
+    nonisolated static func estimateRequiredStorageMB(duration: Double) -> Int {
+        max(100, Int(ceil(duration * 0.6)) + 50)
+    }
+
+    nonisolated static func evaluateStorage(availableBytes: Int64, duration: Double) throws {
+        let availableMB = max(0, Int(availableBytes / (1024 * 1024)))
+        let estimatedRequiredMB = estimateRequiredStorageMB(duration: duration)
+        if availableMB < estimatedRequiredMB {
+            throw VideoConverterError.insufficientStorage(availableMB: availableMB, requiredMB: estimatedRequiredMB)
+        }
+    }
+
+    private nonisolated static func describe(exportError: Error) -> String {
+        let nsError = exportError as NSError
+        if nsError.domain == AVFoundationErrorDomain, nsError.code == AVError.diskFull.rawValue {
+            return "ディスクの空き容量が不足しています"
+        }
+        if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            if underlying.domain == NSPOSIXErrorDomain && underlying.code == ENOSPC {
+                return "ディスクの空き容量が不足しています"
+            }
+            if underlying.domain == AVFoundationErrorDomain && underlying.code == AVError.diskFull.rawValue {
+                return "ディスクの空き容量が不足しています"
+            }
+            return "\(nsError.localizedDescription) (\(underlying.localizedDescription))"
+        }
+        if let failureReason = nsError.localizedFailureReason, !failureReason.isEmpty {
+            return "\(nsError.localizedDescription): \(failureReason)"
+        }
+        return nsError.localizedDescription
     }
 
     private func metadata(for date: Date) -> [AVMetadataItem] {

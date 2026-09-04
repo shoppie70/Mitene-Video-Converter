@@ -134,24 +134,88 @@ struct ContentView: View {
 
 private struct JobRow: View {
     let job: AppModel.Job
+    @State private var isCopied = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Image(systemName: "film")
-                    .foregroundStyle(Color.accentColor)
+                Image(systemName: iconName)
+                    .foregroundStyle(iconColor)
                 Text(job.url.lastPathComponent)
                     .lineLimit(1)
+                    .fontWeight(.medium)
                 Spacer()
                 Text(job.state.label)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(statusColor)
             }
             if case .converting(let progress) = job.state {
                 ProgressView(value: progress)
             }
+            if case .failed(let message) = job.state {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundStyle(.red)
+                        .font(.system(size: 13))
+                        .padding(.top, 1)
+                    Text(message)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.primary)
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Button {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(message, forType: .string)
+                        isCopied = true
+                        Task {
+                            try? await Task.sleep(for: .seconds(2))
+                            isCopied = false
+                        }
+                    } label: {
+                        Label(isCopied ? "コピー完了" : "エラーをコピー", systemImage: isCopied ? "checkmark" : "doc.on.doc")
+                            .font(.system(size: 11))
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(isCopied ? .green : .secondary)
+                }
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.red.opacity(0.08))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.red.opacity(0.25), lineWidth: 1)
+                )
+            }
         }
         .padding(16)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color(nsColor: .controlBackgroundColor)))
+    }
+
+    private var iconName: String {
+        switch job.state {
+        case .failed: return "exclamationmark.triangle.fill"
+        case .completed: return "checkmark.circle.fill"
+        default: return "film"
+        }
+    }
+
+    private var iconColor: Color {
+        switch job.state {
+        case .failed: return .red
+        case .completed: return .green
+        default: return Color.accentColor
+        }
+    }
+
+    private var statusColor: Color {
+        switch job.state {
+        case .failed: return .red
+        case .completed: return .green
+        default: return .secondary
+        }
     }
 }

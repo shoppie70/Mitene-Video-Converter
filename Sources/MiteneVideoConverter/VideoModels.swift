@@ -1,24 +1,27 @@
 @preconcurrency import AVFoundation
 import Foundation
 
-enum VideoConverterError: LocalizedError {
+enum VideoConverterError: LocalizedError, Equatable {
     case unreadableVideo
     case unsupportedVideo
     case noVideoTrack
     case exportFailed(String)
-    case insufficientStorage
+    case insufficientStorage(availableMB: Int, requiredMB: Int)
     case photoLibraryAccessDenied
 
     var errorDescription: String? {
         switch self {
         case .unreadableVideo:
-            return "動画を正常に読み込めませんでした。ファイルが壊れている可能性があります。"
+            return "動画を正常に読み込めませんでした。ファイルが壊れているか、対応していない形式の可能性があります。"
         case .unsupportedVideo, .noVideoTrack:
-            return "この動画は読み込めませんでした。"
-        case .exportFailed:
-            return "動画を変換できませんでした。"
-        case .insufficientStorage:
-            return "保存先の空き容量が足りません。"
+            return "この動画のフォーマットはサポートされていないか、映像トラックがありません。"
+        case .exportFailed(let reason):
+            if reason.isEmpty {
+                return "動画の変換に失敗しました。"
+            }
+            return "動画の変換に失敗しました: \(reason)"
+        case .insufficientStorage(let availableMB, let requiredMB):
+            return "保存先の空き容量が足りません（空き: 約\(availableMB)MB / 必要目安: 約\(requiredMB)MB）。ディスクの空き容量を確保してください。"
         case .photoLibraryAccessDenied:
             return "写真アプリへのアクセスが許可されていません。"
         }

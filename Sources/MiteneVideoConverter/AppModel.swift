@@ -18,7 +18,7 @@ final class AppModel: ObservableObject {
             case .analyzing: return "読み込み中…"
             case .converting: return "みてね用に変換中…"
             case .completed(let count): return "完了（\(count)本）"
-            case .failed(let message): return message
+            case .failed: return "エラー"
             }
         }
     }
