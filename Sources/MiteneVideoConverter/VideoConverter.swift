@@ -73,6 +73,11 @@ final class VideoConverter {
             throw VideoConverterError.unsupportedVideo
         }
 
+        let segmentRange = CMTimeRange(
+            start: CMTime(seconds: segment.start, preferredTimescale: 600),
+            duration: CMTime(seconds: segment.duration, preferredTimescale: 600)
+        )
+
         let composition = AVMutableVideoComposition()
         let transformedRect = CGRect(origin: .zero, size: sourceSize).applying(sourceTransform).standardized
         let displayedWidth = max(1, abs(transformedRect.width))
@@ -92,17 +97,14 @@ final class VideoConverter {
         composition.colorYCbCrMatrix = AVVideoYCbCrMatrix_ITU_R_709_2
 
         let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRange(start: .zero, duration: CMTime(seconds: segment.duration, preferredTimescale: 600))
+        instruction.timeRange = segmentRange
         let layer = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
         layer.setTransform(scaledTransform, at: .zero)
         instruction.layerInstructions = [layer]
         composition.instructions = [instruction]
 
         session.videoComposition = composition
-        session.timeRange = CMTimeRange(
-            start: CMTime(seconds: segment.start, preferredTimescale: 600),
-            duration: CMTime(seconds: segment.duration, preferredTimescale: 600)
-        )
+        session.timeRange = segmentRange
         return session
     }
 

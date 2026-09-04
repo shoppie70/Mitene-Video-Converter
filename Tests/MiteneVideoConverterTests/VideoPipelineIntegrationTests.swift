@@ -52,6 +52,43 @@ final class VideoPipelineIntegrationTests: XCTestCase {
         )
     }
 
+    func testMultiSegmentMovieIsConvertedWithoutVideoCompositionError() async throws {
+        guard Self.ffmpegURL != nil else {
+            throw XCTSkip("ffmpeg is required for the local pipeline smoke test")
+        }
+
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("mitene-multi-pipeline-\(UUID().uuidString)", isDirectory: true)
+        let inputURL = root.appendingPathComponent("sample.mov")
+        let outputDirectory = root.appendingPathComponent("output", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try Self.makeFixture(at: inputURL)
+
+        let analysis = try await VideoAnalyzer().analyze(url: inputURL)
+        // 1秒の動画を2分割（0〜0.5秒、0.5〜1.0秒）するプランを作成して start > 0 のセグメント変換をテスト
+        let plan = ConversionPlan(
+            outputSize: VideoSize(width: 640, height: 360),
+            outputFrameRate: 30,
+            segments: [
+                ConversionSegment(index: 0, start: 0, duration: 0.5, creationDate: analysis.creationDate),
+                ConversionSegment(index: 1, start: 0.5, duration: 0.5, creationDate: analysis.creationDate.addingTimeInterval(0.5)),
+            ]
+        )
+
+        let outputs = try await VideoConverter().convert(
+            analysis: analysis,
+            plan: plan,
+            outputDirectory: outputDirectory,
+            progress: { _ in }
+        )
+
+        XCTAssertEqual(outputs.count, 2)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: outputs[0].path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: outputs[1].path))
+    }
+
     private static var ffmpegURL: URL? {
         let candidates = [
             "/opt/homebrew/bin/ffmpeg",
