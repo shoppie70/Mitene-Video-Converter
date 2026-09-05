@@ -29,6 +29,9 @@ UNIVERSAL_BINARY="$OUTPUT_DIR/$PRODUCT-universal"
 lipo -create "$ARM_BINARY" "$INTEL_BINARY" -output "$UNIVERSAL_BINARY"
 cp "$UNIVERSAL_BINARY" "$APP_PATH/Contents/MacOS/$PRODUCT"
 cp "$ROOT_DIR/Resources/Info.plist" "$APP_PATH/Contents/Info.plist"
+if [[ -f "$ROOT_DIR/Resources/AppIcon.icns" ]]; then
+  cp "$ROOT_DIR/Resources/AppIcon.icns" "$APP_PATH/Contents/Resources/AppIcon.icns"
+fi
 
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PATH/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$APP_PATH/Contents/Info.plist"

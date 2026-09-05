@@ -9,6 +9,10 @@ format = "UDZO"
 filesystem = "HFS+"
 files = [(str(app_path), "2分にしてね.app")]
 symlinks = {"Applications": "/Applications"}
+icon_path = root / "Resources" / "AppIcon.icns"
+if icon_path.exists():
+    icon = str(icon_path)
+    badge_icon = str(icon_path)
 background = str(root / "assets" / "dmg-background.png")
 hide = [".background.png"]
 hide_extensions = ["2分にしてね.app"]
